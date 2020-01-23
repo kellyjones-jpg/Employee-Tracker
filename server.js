@@ -189,13 +189,13 @@ async function addEmployee() {
 }
 
 
-function createEmployee() {
+function createEmployee(newName) {
   console.log("Inserting a new employee...\n");
   connection.query(
     "INSERT INTO employee SET ?",
     {
-      first_name: "test first name",
-      last_name: "test last name",
+      first_name: newName,
+      last_name: newName,
       role_id: 1,
       manager_id: 2,
     },
