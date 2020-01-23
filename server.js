@@ -58,6 +58,10 @@ function questionsIntro() {
           {
             name: 'update employee roles',
             value: 'update_employees'
+          },
+          {
+            name: 'quit',
+            value: 'quit'
           }
         ],
       },
@@ -79,11 +83,21 @@ function questionsIntro() {
         case 'view_roles':
           return readRoles();
 
-        case 'add_departments':
+        case 'add_department':
           return addDepartment();  
 
-        default:
-          return quit();
+        case 'add_role':
+          return addRole();
+          
+        case 'add_employee':
+          return addEmployee();
+          
+        case 'update_role':
+          return updateRole();  
+
+        case 'quit':
+          default:
+            process.exit();
       }
     });
 }
@@ -95,7 +109,7 @@ async function addDepartment() {
         {
           type: 'input',
           name: 'name',
-          message: 'Department name?'
+          message: 'Name of department?'
         }
       ])
       .then(answers => {
@@ -106,26 +120,42 @@ async function addDepartment() {
       });
 }
 
-function createDepartment(name) {
+function createDepartment(newName) {
   console.log("Inserting a new department...\n");
-  var query = connection.query(
-    "INSERT INTO departments SET ?",
+  connection.query(
+    "INSERT INTO department SET ?",
     {
-      dep_name: name
+      name: newName
     },
     function(err, res) {
       if (err) throw err;
       console.log(res.affectedRows + " department inserted!\n");
+      questionsIntro();
     }
   );
-
-  // logs the actual query being run
-  console.log(query.sql);
 }
 
-function createRoles() {
+async function addRole() {
+
+  inquirer
+      .prompt([
+        {
+          type: 'input',
+          name: 'name',
+          message: 'Name of role?'
+        }
+      ])
+      .then(answers => {
+        createRole(answers.name);
+      })
+      .then(() => {
+        readRoles();
+      });
+}
+
+function createRole() {
   console.log("Inserting a new role...\n");
-  var query = connection.query(
+  connection.query(
     "INSERT INTO em_role SET ?",
     {
       title: "test title",
@@ -135,16 +165,33 @@ function createRoles() {
     function(err, res) {
       if (err) throw err;
       console.log(res.affectedRows + " role inserted!\n");
+      questionsIntro();
     }
   );
-
-  // logs the actual query being run
-  console.log(query.sql);
 }
+
+async function addEmployee() {
+
+  inquirer
+      .prompt([
+        {
+          type: 'input',
+          name: 'name',
+          message: 'Name of employee?'
+        }
+      ])
+      .then(answers => {
+        createEmployee(answers.name);
+      })
+      .then(() => {
+        readEmployees();
+      });
+}
+
 
 function createEmployee() {
   console.log("Inserting a new employee...\n");
-  var query = connection.query(
+  connection.query(
     "INSERT INTO employee SET ?",
     {
       first_name: "test first name",
@@ -155,11 +202,9 @@ function createEmployee() {
     function(err, res) {
       if (err) throw err;
       console.log(res.affectedRows + " employee inserted!\n");
+      questionsIntro();
     }
   );
-
-  // logs the actual query being run
-  console.log(query.sql);
 }
 
 function updateRole(salaryNum, idNum) {
@@ -193,6 +238,8 @@ function readDepartments(cb) {
     // Log all results of the SELECT statement
     console.table(res);
     // connection.end(); add a separate function called stop
+  
+      questionsIntro();
   });
 }
 
@@ -203,16 +250,19 @@ function readRoles() {
     // Log all results of the SELECT statement
     console.table(res);
     // connection.end(); add a separate function called stop
+
+    questionsIntro();
   });
 }
 
 function readEmployees() {
   console.log("Selecting all employees...\n");
-  connection.query("SELECT * FROM employee", function(err, res) {
+  connection.query("SELECT first_name, last_name FROM employee", function(err, res) {
     if (err) throw err;
     // Log all results of the SELECT statement
     console.table(res);
     // connection.end(); add a separate function called stop
+    questionsIntro();
   });
 }
 
