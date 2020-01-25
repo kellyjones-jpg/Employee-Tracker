@@ -114,9 +114,6 @@ async function addDepartment() {
       ])
       .then(answers => {
         createDepartment(answers.name);
-      })
-      .then(() => {
-        readDepartments();
       });
 }
 
@@ -136,31 +133,38 @@ function createDepartment(newName) {
 }
 
 async function addRole() {
-
-  inquirer
-      .prompt([
-        {
-          type: 'input',
-          name: 'name',
-          message: 'Name of role?'
-        }
-      ])
-      .then(answers => {
-        createRole(answers.name);
-      })
-      .then(() => {
-        readRoles();
-      });
+  var questions = [
+  {
+    message: "What is the new role title?",
+    type: "input",
+    name: "title"
+  },
+  {
+    message: "What is the salary for this role?",
+    type: "input",
+    name: "salary"
+  },
+  {
+    message: "What is the department ID for this role?",
+    type: "input",
+    name: "department_id"
+  }
+  ];
+  inquirer.prompt(questions)
+    .then(answers=> {
+      createRole(answers);
+    }
+  )
 }
 
-function createRole() {
+function createRole(newRole) {
   console.log("Inserting a new role...\n");
   connection.query(
     "INSERT INTO em_role SET ?",
     {
-      title: "test title",
-      salary: 100.00,
-      dep_id: 1
+      title: newRole.title,
+      salary: newRole.salary,
+      dep_id: newRole.department_id
     },
     function(err, res) {
       if (err) throw err;
@@ -182,9 +186,6 @@ async function addEmployee() {
       ])
       .then(answers => {
         createEmployee(answers.name);
-      })
-      .then(() => {
-        readEmployees();
       });
 }
 
