@@ -91,6 +91,9 @@ function questionsIntro() {
 
             case 'add_employees':
               return addEmployee(); 
+            
+              case 'update_employees':
+                return updateEmployee();
 
         case 'quit':
         default:
@@ -171,17 +174,24 @@ function createRole(newRole) {
 async function addEmployee() {
   var questions = [
   {
-    message: "What is the new role title?",
+    message: "What is the employee's first name?",
     type: "input",
-    name: "title"
-  },{
-    message: "What is the salary for this role?",
+    name: "first_name"
+  },
+  {
+    message: "What is the employee's last name?",
     type: "input",
-    name: "salary"
-  },{
-    message: "What is the department ID for this role?",
+    name: "last_name"
+  },
+  {
+    message: "What is the role ID?",
     type: "input",
-    name: "department_id"
+    name: "role_id"
+  },
+  {
+    message: "What is the manager ID?",
+    type: "input",
+    name: "manager_id"
   }
   ];
   inquirer.prompt(questions)
@@ -191,38 +201,60 @@ async function addEmployee() {
   )
 }
 
-function createEmployee() {
+function createEmployee(newEmployee) {
   console.log("Inserting a new employee...\n");
   var query = connection.query(
     "INSERT INTO employee SET ?",
     {
-      first_name: "test first name",
-      last_name: "test last name",
-      role_id: 1,
-      manager_id: 2,
+      first_name: newEmployee.first_name,
+      last_name: newEmployee.last_name,
+      role_id: newEmployee.role_id,
+      manager_id: newEmployee.manager_id,
     },
     function(err, res) {
       if (err) throw err;
       console.log(res.affectedRows + " employee inserted!\n");
+      questionsIntro();
     }
   );
 }
 
-function updateRole(salaryNum, idNum) {
+async function updateEmployee() {
+  var questions = [
+  {
+    message: "What is the employee's ID?",
+    type: "input",
+    name: "role_id"
+  },
+  {
+    message: "What is the new role?",
+    type: "input",
+    name: "id"
+  }
+  ];
+  inquirer.prompt(questions)
+    .then(answers=> {
+      updateRole(answers);
+    }
+  )
+}
+
+function updateRole(updateRole) {
   console.log("Updating role salary...\n");
   var query = connection.query(
-    "UPDATE em_role SET ? WHERE ?",
+    "UPDATE employee SET ? WHERE ?",
     [
       {
-        salary: salaryNum
+        role_id: updateRole.role_id
       },
       {
-        id: idNum
+        id: updateRole.id
       }
     ],
     function(err, res) {
       if (err) throw err;
-      console.log(res.affectedRows + " salary updated!\n");
+      console.log(res.affectedRows + " role updated!\n");
+      questionsIntro();
     }
   );
 }
